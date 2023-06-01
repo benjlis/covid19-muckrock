@@ -1,0 +1,30 @@
+set search_path=covid19_muckrock;
+create table metadata_stage (
+	 id 	 text,
+	 access 	 text,
+	 asset_url 	 text,
+	 canonical_url 	 text,
+	 created_at 	 text,
+	 data 	 text,
+	 description 	 text,
+	 edit_access 	 text,
+	 file_hash 	 text,
+	 noindex 	 text,
+	 language 	 text,
+	 organization 	 text,
+	 original_extension 	 text,
+	 page_count 	 text,
+	 page_spec 	 text,
+	 projects 	 text,
+	 publish_at 	 text,
+	 published_url 	 text,
+	 related_article 	 text,
+	 revision_control 	 text,
+	 slug 	 text,
+	 source 	 text,
+	 status 	 text,
+	 title 	 text,
+	 updated_at 	 text,
+	 userinfo 	 text
+);
+\copy metadata_stage(id, access, asset_url, canonical_url, created_at, data, description, edit_access, file_hash, noindex, language, organization, original_extension, page_count, page_spec, projects, publish_at, published_url, related_article, revision_control, slug, source, status, title, updated_at, userinfo) from 'csv2pg-muckrock-covid19.csv' DELIMITER ',' CSV HEADER;

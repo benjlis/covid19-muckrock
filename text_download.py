@@ -8,4 +8,7 @@ stmts = aiosql.from_path("sql/download.sql", "psycopg2")
 
 docs = stmts.get_doc_download_list(conn)
 for d in docs:
-    print(d)
+    cnt, doc_id, pg_cnt, print_prefix = d[0], d[1], d[2], d[3]
+    print(cnt, doc_id, pg_cnt, print_prefix)
+    for p in range(pg_cnt):
+        print(f'{print_prefix}{p+1}.txt')

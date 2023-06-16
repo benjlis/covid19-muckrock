@@ -5,7 +5,6 @@ import dcapi
 
 # db-related configuration
 conn = psycopg2.connect("")
-conn.autocommit = True
 stmts = aiosql.from_path("sql/download.sql", "psycopg2")
 
 docs = stmts.get_doc_download_list(conn)
@@ -24,3 +23,4 @@ for d in docs:
                            char_cnt=char_cnt, body=pg_text)            
         except Exception as e:
             print(e)
+    conn.commit()      # for performance only commit after every doc

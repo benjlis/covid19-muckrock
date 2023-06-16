@@ -1,5 +1,6 @@
 import psycopg2
 import aiosql
+import dcapi
 
 # db-related configuration
 conn = psycopg2.connect("")
@@ -11,4 +12,8 @@ for d in docs:
     cnt, doc_id, pg_cnt, print_prefix =  d
     print(cnt, doc_id, pg_cnt, print_prefix)
     for p in range(pg_cnt):
-        print(f'{print_prefix}{p+1}.txt')
+        try:
+            pg_text = dcapi.download_page_text(f'{print_prefix}{p+1}.txt')            
+            print(f'{p}: {pg_text}')
+        except Exception as e:
+            print(e)

@@ -5,5 +5,6 @@ select dc_id, dc_id doc_id, title, page_count pg_cnt, lang doc_lang, original_ex
     created_at, updated_at, organization, userinfo username, slug,  
     canonical_url,
 	asset_url || 'documents/' || dc_id || '/' || slug || '.pdf' pdf_url,
-    asset_url || 'documents/' || dc_id || '/pages/' || slug || '-p' pgtxt_prefix
+    'https://api.www.documentcloud.org/files/documents/' || dc_id || 
+    '/pages/' || slug || '-p' pgtxt_prefix
 from covid19_muckrock.metadata;

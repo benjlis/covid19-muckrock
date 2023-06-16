@@ -1,6 +1,7 @@
 create table covid19_muckrock.metadata(
 	 dc_id 	 	     		int	 primary key,
 	 canonical_url 	 		text not null,
+	 access_url             text not null,
 	 created_at 	 		timestamp with time zone not null,
 	 lang    	 	 		text not null,
 	 organization 	    	text not null,
@@ -14,7 +15,6 @@ create table covid19_muckrock.metadata(
 
 -- dropped columns
 --	  access: private, public on DC; ignore as all will be public by go live
--- 	  asset_url: two values functionally dependent on access
 --    data: contains tags, possibly revisit later
 --    description: empty column  
 --    edit_access: boolean; not valuable for metadata, ask Muckrock why FALSE for many docs

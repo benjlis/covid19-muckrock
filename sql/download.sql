@@ -1,11 +1,18 @@
 -- name: get-doc-download-list
--- Get list of all pdfs that can be processed
+-- Get all docs whose text needs downloading
 select row_number() over (order by d.doc_id), 
        d.doc_id, d.pg_cnt, d.pgtxt_prefix
     from covid19_muckrock.docs d
     where not exists (select 1
                                 from covid19_muckrock.pages p
                                 where p.dc_id = d.dc_id);
+
+-- name: get-page-list
+-- Gets all pages
+select row_number() over (order by p.dc_id), 
+       p.dc_id, p.pg, p.body
+    from covid19_muckrock.pages p
+    order by p.dc_id, p.pg;
 
 -- name: add-page!
 -- Add page of text to database

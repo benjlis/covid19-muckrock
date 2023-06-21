@@ -5,7 +5,7 @@ import dcapi
 
 # db-related configuration
 conn = psycopg2.connect("")
-stmts = aiosql.from_path("sql/download.sql", "psycopg2")
+stmts = aiosql.from_path("sql/py.sql", "psycopg2")
 
 docs = stmts.get_doc_download_list(conn)
 for d in docs:

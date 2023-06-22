@@ -12,8 +12,9 @@ select row_number() over (order by d.doc_id),
 select row_number() over (order by p.dc_id), 
        p.dc_id, p.pg, p.body
     from covid19_muckrock.pages p
-    order by p.dc_id, p.pg
-    limit 1000;
+    where p.dc_id = 6840728
+    order by p.dc_id, p.pg;
+    -- limit 1000;
 
 -- name: add-page!
 -- Add page of text to database
@@ -23,4 +24,4 @@ values (:id, :pg, :word_cnt, :char_cnt, :body);
 -- name: add-pii!
 -- Add pii element to database
 insert into covid19_muckrock.pii(dc_id, pg, pii_type, pii_text, start_idx, end_idx)
-values (:id, :pg, :pii_type, :pii_text, :start_idx, end_idx);
+values (:id, :pg, :pii_type, :pii_text, :start_idx, :end_idx);

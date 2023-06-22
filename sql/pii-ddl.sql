@@ -5,6 +5,5 @@ create table if not exists covid19_muckrock.pii
      pii_type    text not null references covid19_muckrock.pii_types,
      pii_text    text not null,
      start_idx   int not null,
-     end_idx     int not null,
-     unique (dc_id, pg), 
+     end_idx     int not null, 
      foreign key (dc_id, pg) references covid19_muckrock.pages);

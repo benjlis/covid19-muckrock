@@ -15,10 +15,12 @@ export PGUSER=<postgres_username>
 export PGPASSWORD=<postgres_password>
 export PGHOST=<postgres_host>
 ```
-4. run the downloaders:
+4. run the programs in the pipeline:
 ```
 python metadata_download.py
 python text_download.py
+python pii_detect.py
 ```
 * The metadata program downloads data to a CSV file. SQL scripts then are used to load the data.
 * The text program downloads data directly into a database table.
+* The pii detect program reviews the text and stores pii in a database table.

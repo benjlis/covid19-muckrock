@@ -14,7 +14,7 @@ def store_pii(doc_id, pg, pii_type, pii_list, body):
         start_idx = body.find(p, start_pos)
         end_idx = start_idx + len(p)
         start_pos = end_idx
-        print(f'{pii_type}, {p}, {start_idx}, {end_idx}')
+        # print(f'{pii_type}, {p}, {start_idx}, {end_idx}')
         stmts.add_pii(conn, id=doc_id, pg=pg, pii_type=pii_type,
                       pii_text=p, start_idx=start_idx, end_idx=end_idx) 
 
@@ -33,8 +33,5 @@ for p in pgs:
     now = datetime.datetime.now().strftime('%m-%d %H:%M:%S')
     cnt, doc_id, pg, body =  p
     print(f'{cnt}, {now}, {doc_id}, {pg}')
-    try:
-        detect_store_pii(doc_id, pg, body)   
-    except Exception as e:
-        print(e)
+    detect_store_pii(doc_id, pg, body)   
     conn.commit()      # for performance only commit after every doc

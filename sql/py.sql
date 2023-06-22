@@ -12,7 +12,6 @@ select row_number() over (order by d.doc_id),
 select row_number() over (order by p.dc_id), 
        p.dc_id, p.pg, p.body
     from covid19_muckrock.pages p
-    where p.dc_id = 6840728
     order by p.dc_id, p.pg;
     -- limit 1000;
 

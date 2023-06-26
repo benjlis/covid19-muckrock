@@ -4,3 +4,4 @@
 \copy (select * from covid19_muckrock.pii_top_phones) to '../tmp/pii-top-phones.csv' header csv
 \copy (select * from covid19_muckrock.pii_top_zips) to '../tmp/pii-top-zips.csv' header csv
 \copy (select * from covid19_muckrock.pii_top_addresses) to '../tmp/pii-addresses.csv' header csv
+-- \copy (select * from covid19_muckrock.pii_details where pii_type = 'ssn') to '../tmp/pii-ssn.csv' header csv

@@ -92,3 +92,13 @@ select pii_text, count(pii_text) occurrences, count(distinct dc_id) docs
     group by pii_text 
     order by occurrences desc
     limit 50;
+
+
+drop view if exists covid19_muckrock.pii_details;
+create view covid19_muckrock.pii_details as 
+select d.doc_id, d.title, d.pg_cnt, d.pdf_url,
+       p.pg, p.pii_type, p.pii_text, p.start_idx, p.end_idx,
+       p.detected, p.pii_id
+    from covid19_muckrock.docs d join covid19_muckrock.pii p on (d.dc_id = p.dc_id)
+    order by d.doc_id, p.pg;
+

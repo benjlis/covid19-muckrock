@@ -5,3 +5,4 @@ drop view if exists covid19_muckrock.pii_top_emails;
 drop view if exists covid19_muckrock.pii_top_phones;
 drop view if exists covid19_muckrock.pii_top_zips;
 drop view if exists covid19_muckrock.pii_top_addresses;
+drop view if exists covid19_muckrock.pii_details;

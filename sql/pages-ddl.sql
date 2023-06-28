@@ -7,5 +7,6 @@ create table covid19_muckrock.pages (
     char_cnt        integer     not null,
     downloaded      timestamp with time zone not null default now(),
     body            text        not null,
+    body_md5        text        not null generated always as (md5(body)) stored,
     unique (dc_id, pg)
     );

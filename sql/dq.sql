@@ -32,3 +32,37 @@ select dp.*, dup.copies
       on (dp.body_md5 = dup.body_md5)
    order by dp.body_md5, dp.doc_id, dp.pg;
 
+drop view if exists covid19_muckrock.dq_pages_duplicates;
+create or replace view covid19_muckrock.dq_pages_duplicates as
+select body_md5, doc_id, title, count(*) copies,
+       array_agg(pg order by pg) pgs,
+       char_cnt, substr(body, 1, 512) body_512,
+       canonical_url, pdf_url 
+from covid19_muckrock.dq_docpages_duplicates
+group by body_md5, doc_id, title, char_cnt, substr(body, 1, 512), 
+         canonical_url, pdf_url
+order by body_md5, doc_id;
+
+drop view if exists covid19_muckrock.dq_docs_duplicates;
+create or replace view covid19_muckrock.dq_docs_duplicates as
+select doc_id, title, pg_cnt, count(distinct body_md5) doc_uniq_pg_cnt, 
+       canonical_url, pdf_url
+from covid19_muckrock.dq_docpages_duplicates
+group by doc_id, title, pg_cnt, canonical_url, pdf_url;
+
+drop view if exists covid19_muckrock.dq_docs_duplicates;
+create or replace view covid19_muckrock.dq_docs_duplicates as
+with corpus_unique as (select body_md5 
+                       from covid19_muckrock.pages 
+                       group by body_md5 having count(*) = 1)
+select d.doc_id, d.title, d.pg_cnt, 
+       count(distinct d.body_md5)               doc_uniq_pg_cnt,
+       count(cu.body_md5)                       corpus_uniq_pg_cnt,
+       round(count(distinct cu.body_md5)/pg_cnt::numeric, 2) uniq_ratio,
+       d.canonical_url, d.pdf_url
+from covid19_muckrock.docpages d left join corpus_unique cu 
+                                    on d.body_md5 = cu.body_md5
+group by doc_id, title, pg_cnt, canonical_url, pdf_url
+order by count(distinct cu.body_md5)/d.pg_cnt::numeric, d.pg_cnt desc, d.title, d.doc_id;
+
+-- select doc_id, title, pg_cnt from docs where title in (select title from metadata group by title having count(*) > 1);

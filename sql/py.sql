@@ -13,7 +13,6 @@ select row_number() over (order by p.dc_id),
        p.dc_id, p.pg, p.body, p.page_id
     from covid19_muckrock.pages p
     order by p.dc_id, p.pg;
-    -- limit 1000;
 
 -- name: add-page!
 -- Add page of text to database

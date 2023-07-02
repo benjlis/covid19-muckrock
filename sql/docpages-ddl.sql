@@ -4,7 +4,7 @@ create or replace view covid19_muckrock.docpages as
 select d.*, p.pg, p.word_cnt, p.char_cnt, p.downloaded, 
        p.body, p.body_md5,
        case when pe.page_id is null then 'N' else 'Y'
-       end exception 
+       end exception, pe.exception_type, pe.comments exception_comments 
     from covid19_muckrock.docs d 
             join covid19_muckrock.pages p 
                                     on (d.dc_id = p.dc_id)

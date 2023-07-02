@@ -3,3 +3,4 @@ requests==2.26.0
 psycopg2-binary==2.9.6
 aiosql==8.0
 commonregex-improved==1.0.2
+langdetect==1.0.9

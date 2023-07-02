@@ -61,4 +61,18 @@ order by count(distinct cu.body_md5)/d.pg_cnt::numeric, d.pg_cnt desc, d.title, 
 -- select doc_id, title, pg_cnt from docs where title in (select title from metadata group by title having count(*) > 1);
 
 
+drop view if exists covid19_muckrock.dq_docs_page_exceptions;
+create or replace view covid19_muckrock.dq_docs_page_exceptions as
+select d.doc_id, d.title, d.pg_cnt, 
+       count(d.exception) filter (where d.exception='Y') pg_cnt_exceptions,
+       round(count(d.exception) 
+         filter (where d.exception='Y')/pg_cnt::numeric, 2) exception_ratio,
+       count(d.exception_comments) 
+         filter (where d.exception_comments = 'No features in text.') 
+            pg_cnt_no_text_features,
+       d.canonical_url, d.pdf_url
+from covid19_muckrock.docpages d
+group by d.doc_id, d.title, d.pg_cnt, d.canonical_url, d.pdf_url
+order by count(d.exception) filter (where exception='Y')/pg_cnt::numeric desc; 
+
 

@@ -15,6 +15,7 @@ refresh_token = response.json()["refresh"]
 access_token = response.json()["access"]
 headers = {'Authorization': f'Bearer {access_token}'}
 
+
 def renew_api_token():
     time.sleep(DC_THROTTLE_INTERVAL)
     renew_endpoint = "https://accounts.muckrock.com/api/refresh/"
@@ -23,6 +24,7 @@ def renew_api_token():
     global access_token, headers
     access_token = r.json()["access"]
     headers = {'Authorization': f'Bearer {access_token}'}
+
 
 def download_page_text(page_text_endpoint):
     time.sleep(DC_THROTTLE_INTERVAL)
@@ -34,6 +36,14 @@ def download_page_text(page_text_endpoint):
     r.raise_for_status()
     return r.text
 
+def download_pdf(url, dfile):
+    response = requests.get(url, headers=headers)
+    with open(dfile, 'wb') as f:
+        f.write(response.content)
+    return response.status_code
+
 if __name__ == '__main__':
     # print (f'{access_token=} \n{refresh_token=}')
-    download_page_text('https://s3.documentcloud.org/documents/20488670/pages/sitka-p2.txt')
+    # download_page_text('https://s3.documentcloud.org/documents/20488670/pages/sitka-p2.txt')
+    download_pdf('https://api.www.documentcloud.org/files/documents/23823940/hhs-march-2022-production.pdf',
+                 'tmp/test.pdf')

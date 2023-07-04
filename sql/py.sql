@@ -7,6 +7,12 @@ select row_number() over (order by d.doc_id),
                                 from covid19_muckrock.pages p
                                 where p.dc_id = d.dc_id);
 
+-- name: get-doc-pdf-list
+select row_number() over (order by d.doc_id), 
+       d.doc_id, pdf_url
+    from covid19_muckrock.docs d;
+
+
 -- name: get-page-list
 -- Gets all pages
 select row_number() over (order by p.dc_id), 

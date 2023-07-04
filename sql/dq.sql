@@ -28,7 +28,8 @@ select body_md5, count(body_md5) copies
 drop view if exists covid19_muckrock.dq_docpages_duplicates;
 create or replace view covid19_muckrock.dq_docpages_duplicates as
 select dp.*, dup.copies
-   from covid19_muckrock.docpages dp join dq_body_md5_duplicates dup
+   from covid19_muckrock.docpages dp join 
+         covid19_muckrock.dq_body_md5_duplicates dup
       on (dp.body_md5 = dup.body_md5)
    order by dp.body_md5, dp.doc_id, dp.pg;
 

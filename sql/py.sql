@@ -9,7 +9,7 @@ select row_number() over (order by d.doc_id),
 
 -- name: get-doc-pdf-list
 select row_number() over (order by d.doc_id), 
-       d.doc_id, pdf_url
+       d.doc_id, api_pdf_url
     from covid19_muckrock.docs d;
 
 

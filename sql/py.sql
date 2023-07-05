@@ -29,3 +29,18 @@ values (:id, :pg, :word_cnt, :char_cnt, :body);
 -- Add pii element to database
 insert into covid19_muckrock.pii(dc_id, pg, pii_type, pii_text, start_idx, end_idx)
 values (:id, :pg, :pii_type, :pii_text, :start_idx, :end_idx);
+
+-- name: add-pdf!
+-- Add pdf metadata to database
+insert into covid19_muckrock.pdfs(dc_id, size, filename, pg_cnt, 
+               version, title, author, subject, 
+               keywords, creator, producer, 
+               created, 
+               modified, 
+               trapped, encryption, xml_metadata, s3_uploaded)
+values (:id, :size, :filename, :pg_cnt, 
+               :version, :title, :author, :subject,
+               :keywords, :creator, :producer, 
+               to_timestamp(:created, 'YYYYMMDDHH24MISSTZH'),
+               to_timestamp(:modified, 'YYYYMMDDHH24MISSTZH'), 
+               :trapped, :encryption, :xml_metadata, :s3_uploaded);

@@ -37,13 +37,19 @@ def download_page_text(page_text_endpoint):
     return r.text
 
 def download_pdf(url, dfile):
-    response = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers)
+    r.raise_for_status()
     with open(dfile, 'wb') as f:
-        f.write(response.content)
-    return response.status_code
+        f.write(r.content)
+    return r.status_code
 
 if __name__ == '__main__':
     # print (f'{access_token=} \n{refresh_token=}')
     # download_page_text('https://s3.documentcloud.org/documents/20488670/pages/sitka-p2.txt')
-    download_pdf('https://api.www.documentcloud.org/files/documents/23823940/hhs-march-2022-production.pdf',
-                 'tmp/test.pdf')
+    # download_pdf('https://api.www.documentcloud.org/files/documents/23823940/hhs-march-2022-production.pdf',
+    #             'tmp/test.pdf')
+    download_pdf('https://s3.documentcloud.org/documents/6808332/MDHHS-Interim-Recommendations-for-COVID-19-Final.pdf',
+                 'prob.pdf')
+    # download_pdf('https://api.www.documentcloud.org/files/documents/6808332/MDHHS-Interim-Recommendations-for-COVID-19-Final.pdf',
+    #               'prob.pdf')
+

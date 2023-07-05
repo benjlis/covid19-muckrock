@@ -4,13 +4,16 @@ select row_number() over (order by d.doc_id),
        d.doc_id, d.pg_cnt, d.pgtxt_prefix
     from covid19_muckrock.docs d
     where not exists (select 1
-                                from covid19_muckrock.pages p
-                                where p.dc_id = d.dc_id);
+                        from covid19_muckrock.pages p
+                        where p.dc_id = d.dc_id);
 
 -- name: get-doc-pdf-list
 select row_number() over (order by d.doc_id), 
        d.doc_id, api_pdf_url
-    from covid19_muckrock.docs d;
+    from covid19_muckrock.docs d
+    where not exists (select 1
+                        from covid19_muckrock.pdfs p
+                        where p.dc_id = d.dc_id);
 
 
 -- name: get-page-list

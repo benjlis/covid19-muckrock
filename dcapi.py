@@ -37,7 +37,12 @@ def download_page_text(page_text_endpoint):
     return r.text
 
 def download_pdf(url, dfile):
+    time.sleep(DC_THROTTLE_INTERVAL)
     r = requests.get(url, headers=headers)
+    if (r.status_code == 403 or r.status_code == 429):
+       print(f'renewing token: {r.status_code} on {url}')       
+       renew_api_token()
+       r = requests.get(url, headers=headers)    
     r.raise_for_status()
     with open(dfile, 'wb') as f:
         f.write(r.content)

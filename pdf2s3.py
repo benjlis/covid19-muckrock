@@ -52,7 +52,6 @@ for p in pgs:
         xml_metadata  = d.get_xml_metadata()
         pg_cnt = d.page_count
     print(metadata)
-    print(f'{xml_metadata}=**')
     s3_uploaded = upload_s3(pdf_file, S3_BUCKET, S3_OBJECT_PREFIX + pdf_file)
     if s3_uploaded:
         stmts.add_pdf(conn, id=doc_id, size=pdf_size, 

@@ -3,7 +3,6 @@ import psycopg2
 import os
 import dcapi
 import boto3
-import datetime
 import fitz
 
 

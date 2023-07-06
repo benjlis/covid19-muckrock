@@ -18,7 +18,7 @@ select *
     order by doc_id, pg;
 
 
-drop view if exists covid19_muckrock.dq_body_md5_duplicates;
+drop view if exists covid19_muckrock.dq_body_md5_duplicates cascade;
 create or replace view covid19_muckrock.dq_body_md5_duplicates as
 select body_md5, count(body_md5) copies
    from covid19_muckrock.pages
@@ -71,9 +71,13 @@ select d.doc_id, d.title, d.pg_cnt,
        count(d.exception_comments) 
          filter (where d.exception_comments = 'No features in text.') 
             pg_cnt_no_text_features,
-       d.canonical_url, d.pdf_url
+       d.canonical_url, d.pdf_url, d.dc_organization, d.dc_username,
+       d.pdf_version, d.pdf_author, d.pdf_creator, d.pdf_producer, 
+       d.pdf_encryption
 from covid19_muckrock.docpages d
-group by d.doc_id, d.title, d.pg_cnt, d.canonical_url, d.pdf_url
+group by d.doc_id, d.title, d.pg_cnt, d.canonical_url, d.pdf_url,
+         d.dc_organization, d.dc_username, d.pdf_version, d.pdf_author,
+         d.pdf_creator, d.pdf_producer, d.pdf_encryption
 order by count(d.exception) filter (where exception='Y')/pg_cnt::numeric desc; 
 
 

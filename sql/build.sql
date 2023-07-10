@@ -8,5 +8,4 @@ create schema if not exists covid19_muckrock;
 \i docpages-ddl.sql
 \i doctext-ddl.sql
 -- grants
-grant usage on schema covid19_muckrock to c19ro;
-grant select on all tables in schema covid19_muckrock to c19ro;
+\i c19ro-priv.sql

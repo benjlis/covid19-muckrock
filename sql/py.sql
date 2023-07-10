@@ -47,3 +47,12 @@ values (:id, :size, :filename, :pg_cnt,
                to_timestamp(:created, 'YYYYMMDDHH24MISSTZH'),
                to_timestamp(:modified, 'YYYYMMDDHH24MISSTZH'), 
                :trapped, :encryption, :xml_metadata, :s3_uploaded);
+
+-- name: add-email!
+-- Add email metadata to database
+insert into covid19_muckrock.emails (page_id, header_begin_ln, 
+   header_end_ln, subject, sent, from_email, to_emails, cc_emails, 
+   bcc_emails, attachments, importance, header_unprocessed) 
+values (:page_id, :header_begin_ln, :header_end_ln, :subject, :sent, 
+   :from_email, :to_emails, :cc_emails, :bcc_emails, :attachments, 
+   :importance, :header_unprocessed);

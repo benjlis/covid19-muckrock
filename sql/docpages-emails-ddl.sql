@@ -1,7 +1,6 @@
--- metadata view
 drop view if exists covid19_muckrock.docpages_emails;
 create or replace view covid19_muckrock.docpages_emails as
-select d.doc_id, d.pg, d.title doc_title, d.pg_cnt, 
+select d.doc_id, d.pg, d.title doc_title, d.pg_cnt, d.body, 
        e.email_id, e.processed, e.subject, e.sent, 
        e.from_email, e.to_emails, e.cc_emails, e.bcc_emails,
        e.attachments, e.importance, e.header_unprocessed,

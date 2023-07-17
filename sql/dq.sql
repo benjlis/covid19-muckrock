@@ -66,6 +66,15 @@ drop view if exists covid19_muckrock.dq_docs_page_exceptions;
 create or replace view covid19_muckrock.dq_docs_page_exceptions as
 select d.doc_id, d.title, d.pg_cnt, 
        count(d.exception) filter (where d.exception='Y') pg_cnt_exceptions,
+       count(d.exception) filter 
+         (where d.exception='Y' and 
+                d.exception_type = 'blank_sparse') pg_cnt_blank_sparse,
+      count(d.exception) filter 
+         (where d.exception='Y' and 
+                d.exception_type = 'compressed_margins') pg_cnt_compressed_margins,
+      count(d.exception) filter 
+         (where d.exception='Y' and 
+                d.exception_type = 'langdetect') pg_cnt_langdetect,                
        round(count(d.exception) 
          filter (where d.exception='Y')/pg_cnt::numeric, 2) exception_ratio,
        count(d.exception_comments) 

@@ -4,8 +4,17 @@ create or replace view covid19_muckrock.docpages as
 select d.*, p.pg, p.page_id, p.downloaded,  
        p.line_cnt, p.max_line_length, p.word_cnt, p.char_cnt, 
        p.body, p.body_md5,
-       case when pe.page_id is null then 'N' else 'Y'
-       end exception, pe.exception_type, pe.comments exception_comments 
+       case when p.word_cnt <= 4        then 'Y'
+            when max_line_length <= 8   then 'Y'
+            when pe.page_id is not null then 'Y'
+            else 'N'
+       end exception, 
+       case when p.word_cnt <= 4        then 'blank_sparse'
+            when max_line_length <=8    then 'compressed_margins'
+            when pe.page_id is not null then pe.exception_type
+            else NULL
+       end exception_type, 
+       pe.comments exception_comments 
     from covid19_muckrock.docs d 
             join covid19_muckrock.pages p 
                                     on (d.dc_id = p.dc_id)

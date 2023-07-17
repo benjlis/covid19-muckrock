@@ -8,8 +8,8 @@ select row_number() over (order by d.doc_id),
                         where p.dc_id = d.dc_id);
 
 
--- name: get-doc-pdf-id
-select doc_id, pdf_filename
+-- name: get-doc-pdf-filename$
+select pdf_filename
     from covid19_muckrock.docs
     where doc_id = :doc_id;
 

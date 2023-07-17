@@ -7,6 +7,12 @@ select row_number() over (order by d.doc_id),
                         from covid19_muckrock.pages p
                         where p.dc_id = d.dc_id);
 
+
+-- name: get-doc-pdf-id
+select doc_id, pdf_filename
+    from covid19_muckrock.docs
+    where doc_id = :doc_id;
+
 -- name: get-doc-pdf-list
 select row_number() over (order by d.doc_id), 
        d.doc_id, api_pdf_url

@@ -1,5 +1,6 @@
 *.csv
 tmp/
+scratch.sql
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -7,6 +7,24 @@ select row_number() over (order by d.doc_id),
                         from covid19_muckrock.pages p
                         where p.dc_id = d.dc_id);
 
+-- name: get-doc-exception-list
+-- Get all docs with at least one page exception
+select row_number() over (order by d.doc_id), 
+       d.doc_id, d.title, d.s3_pdf_url
+    from covid19_muckrock.docs d
+    where exists (select 1
+                        from covid19_muckrock.docpages dp
+                        where d.doc_id = dp.doc_id and 
+                              exception = 'Y') and 
+          d.title = 'Sitka';
+
+-- name: get-docpage-exception-list
+-- Get all docs with at least one page exception
+select row_number() over (order by dp.doc_id), 
+       dp.pg, dp.page_id, dp.exception_type
+    from covid19_muckrock.docpages dp
+    where dp.doc_id = :doc_id and dp.exception = 'Y'
+    order by dp.pg;
 
 -- name: get-doc-pdf-filename$
 select pdf_filename

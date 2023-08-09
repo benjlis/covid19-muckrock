@@ -1,5 +1,5 @@
 -- metadata view
-drop view if exists covid19_muckrock.docs;
+-- drop view if exists covid19_muckrock.docs;
 create or replace view covid19_muckrock.docs  as
 select m.dc_id, m.dc_id doc_id, m.title, m.page_count pg_cnt, 
     m.lang doc_lang, m.original_extension, 
@@ -21,4 +21,6 @@ select m.dc_id, m.dc_id doc_id, m.title, m.page_count pg_cnt,
     p.downloaded pdf_downloaded, p.encryption pdf_encryption,
     round(p.size/1024./1024., 3) pdf_size_mb, p.pg_cnt pdf_pg_cnt 
 from covid19_muckrock.metadata m join covid19_muckrock.pdfs p 
-    on (m.dc_id = p.dc_id);
+    on (m.dc_id = p.dc_id)
+where -- remove duplicates of 23823808, 20404047, 21080904 
+      m.dc_id not in (23824236, 20404053, 21120835);

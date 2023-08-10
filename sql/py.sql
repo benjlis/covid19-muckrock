@@ -86,3 +86,8 @@ insert into covid19_muckrock.emails (page_id, header_begin_ln,
 values (:page_id, :header_begin_ln, :header_end_ln, :subject, :sent, 
    :from_email, :to_emails, :cc_emails, :bcc_emails, :attachments, 
    :importance, :header_unprocessed);
+
+-- name: add-entity!^
+insert into covid19_muckrock.entities(entity, enttype)
+values (:entity, :enttype) returning entity_id;
+

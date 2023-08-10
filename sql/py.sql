@@ -47,6 +47,12 @@ select row_number() over (order by p.dc_id),
     from covid19_muckrock.pages p
     order by p.dc_id, p.pg;
 
+
+-- name: get-page-body$
+select body
+    from covid19_muckrock.pages
+    where page_id = :page_id;
+
 -- name: add-page!
 -- Add page of text to database
 insert into covid19_muckrock.pages(dc_id, pg, word_cnt, char_cnt, body)

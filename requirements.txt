@@ -7,3 +7,4 @@ langdetect==1.0.9
 boto3==1.27.0
 PyMuPDF==1.22.5
 pytesseract==0.3.10
+ocrmypdf==14.3.0

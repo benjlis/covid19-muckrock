@@ -87,7 +87,16 @@ values (:page_id, :header_begin_ln, :header_end_ln, :subject, :sent,
    :from_email, :to_emails, :cc_emails, :bcc_emails, :attachments, 
    :importance, :header_unprocessed);
 
--- name: add-entity!^
+-- name: add-entity<!
 insert into covid19_muckrock.entities(entity, enttype)
 values (:entity, :enttype) returning entity_id;
 
+-- name: add-entity-pages!
+insert into covid19_muckrock.entity_pages(entity_id, page_id, etext, 
+                                          etype, estart, eend)
+values (:entity_id, :page_id, :etext, :etype, :estart, :eend);
+
+-- name: get-entity-id-by-name^
+select entity_id
+   from covid19_muckrock.entities
+   where entity = :name; 

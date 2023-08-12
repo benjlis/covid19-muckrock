@@ -63,8 +63,9 @@ values (:id, :pg, :word_cnt, :char_cnt, :body);
 update covid19_muckrock.pages
    set body =     :body,
        char_cnt = :char_cnt,
-       word_cnt = :word_cnt
+       word_cnt = :word_cnt,
        -- deal with max_line_length
+       reprocessed = now()
    where page_id = :page_id;
 
 -- name: add-pii!

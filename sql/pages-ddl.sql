@@ -6,6 +6,7 @@ create table covid19_muckrock.pages (
     word_cnt        integer     not null,
     char_cnt        integer     not null,
     downloaded      timestamp with time zone not null default now(),
+    reprocessed     timestamp with time zone,
     body            text        not null,
     body_md5        text        not null 
         generated always as (md5(body)) stored,

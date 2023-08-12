@@ -58,6 +58,15 @@ select body
 insert into covid19_muckrock.pages(dc_id, pg, word_cnt, char_cnt, body)
 values (:id, :pg, :word_cnt, :char_cnt, :body);
 
+-- name: store-reprocessed-page!
+-- Update page body and related attributes when page is reprocessed.
+update covid19_muckrock.pages
+   set body =     :body,
+       char_cnt = :char_cnt,
+       word_cnt = :word_cnt
+       -- deal with max_line_length
+   where page_id = :page_id;
+
 -- name: add-pii!
 -- Add pii element to database
 insert into covid19_muckrock.pii(dc_id, pg, pii_type, pii_text, start_idx, end_idx)

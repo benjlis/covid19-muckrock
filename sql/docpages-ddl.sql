@@ -1,9 +1,10 @@
 -- metadata view
 drop view if exists covid19_muckrock.docpages cascade;
 create or replace view covid19_muckrock.docpages as
-select d.*, p.pg, p.page_id, p.body, pt.full_text, p.downloaded,  
+select d.*, p.pg, p.page_id, p.body, pt.full_text, 
+       p.downloaded, p.reprocessed, 
        p.line_cnt, p.max_line_length, p.word_cnt, p.char_cnt, 
-       p.body_md5,
+       p.body_md5, 
        case when p.word_cnt <= 4        then 'Y'
             when max_line_length <= 8   then 'Y'
             when pe.page_id is not null then 'Y'

@@ -24,7 +24,8 @@ select row_number() over (order by dp.doc_id),
        dp.pg, dp.page_id, dp.exception_type, dp.body
     from covid19_muckrock.docpages dp
     where dp.doc_id = :doc_id and dp.exception = 'Y'
-    order by dp.pg;
+    order by dp.pg
+    limit 3;;
 
 -- name: get-doc-pdf-filename$
 select pdf_filename
@@ -64,7 +65,7 @@ update covid19_muckrock.pages
    set body =     :body,
        char_cnt = :char_cnt,
        word_cnt = :word_cnt,
-       -- deal with max_line_length
+       max_line_length = :max_line_length,
        reprocessed = now()
    where page_id = :page_id;
 
@@ -101,10 +102,13 @@ values (:page_id, :header_begin_ln, :header_end_ln, :subject, :sent,
 insert into covid19_muckrock.entities(entity, enttype)
 values (:entity, :enttype) returning entity_id;
 
--- name: add-entity-pages!
+-- name: add-entity-page!
 insert into covid19_muckrock.entity_pages(entity_id, page_id, etext, 
                                           etype, estart, eend)
 values (:entity_id, :page_id, :etext, :etype, :estart, :eend);
+
+-- name: delete-entity-page!
+delete from covid19_muckrock.entity_pages where page_id = :page_id;
 
 -- name: get-entity-id-by-name^
 select entity_id

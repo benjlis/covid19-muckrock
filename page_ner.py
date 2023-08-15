@@ -22,14 +22,14 @@ def save_ner(conn, stmts, page_id, entity):
     if not entity_id:
         entity_id =  stmts.add_entity(conn, entity=entity.text, 
                                             enttype=entity.label_)
-        print(f'creating new entity: {entity.text}, {entity.label_}')
+        # print(f'creating new entity: {entity.text}, {entity.label_}')
     stmts.add_entity_page(conn, entity_id=entity_id, page_id=page_id, 
                                  etext=entity.text, 
                                  etype=entity.label_, 
                                  estart=entity.start_char, 
                                  eend=entity.end_char)
-    print(f'adding entity_page: {entity_id}, {page_id}')
-    print(f'   {entity.text}, {entity.label_}, {entity.start_char}, {entity.end_char}')
+    # print(f'adding entity_page: {entity_id}, {page_id}')
+    # print(f'   {entity.text}, {entity.label_}, {entity.start_char}, {entity.end_char}')
 
     
 def page_ner(conn, stmts, page_id):

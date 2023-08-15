@@ -10,7 +10,7 @@ def store_pii(conn, stmts, doc_id, pg, pii_type, pii_list, body):
         start_idx = body.find(p, start_pos)
         end_idx = start_idx + len(p)
         start_pos = end_idx
-        print(f'{pii_type}, {p}, {start_idx}, {end_idx}')
+        # print(f'{pii_type}, {p}, {start_idx}, {end_idx}')
         stmts.add_pii(conn, id=doc_id, pg=pg, pii_type=pii_type,
                       pii_text=p, start_idx=start_idx, end_idx=end_idx) 
 

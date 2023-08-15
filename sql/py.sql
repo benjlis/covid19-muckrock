@@ -74,6 +74,10 @@ update covid19_muckrock.pages
 insert into covid19_muckrock.pii(dc_id, pg, pii_type, pii_text, start_idx, end_idx)
 values (:id, :pg, :pii_type, :pii_text, :start_idx, :end_idx);
 
+-- name: delete-pii!
+-- Delete pii element from database
+delete from covid19_muckrock.pii where dc_id=:doc_id and pg=:pg;
+
 -- name: add-pdf!
 -- Add pdf metadata to database
 insert into covid19_muckrock.pdfs(dc_id, size, filename, pg_cnt, 

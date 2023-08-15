@@ -40,14 +40,12 @@ select row_number() over (order by d.doc_id),
                         from covid19_muckrock.pdfs p
                         where p.dc_id = d.dc_id);
 
-
 -- name: get-page-list
 -- Gets all pages
 select row_number() over (order by p.dc_id), 
        p.dc_id, p.pg, p.body, p.page_id
     from covid19_muckrock.pages p
     order by p.dc_id, p.pg;
-
 
 -- name: get-page-body$
 select body
@@ -73,6 +71,21 @@ update covid19_muckrock.pages
 -- Add pii element to database
 insert into covid19_muckrock.pii(dc_id, pg, pii_type, pii_text, start_idx, end_idx)
 values (:id, :pg, :pii_type, :pii_text, :start_idx, :end_idx);
+
+-- name: add-pii-npp-page!
+-- Add non-public persons at page level
+insert into covid19_muckrock.pii(dc_id, pg, pii_type, pii_text, 
+                                 start_idx, end_idx)
+select p.dc_id, p.pg, 'name', ep.etext, ep.estart, ep.eend
+    from covid19_muckrock.entity_pages ep 
+        join covid19_muckrock.entities e 
+            on (ep.entity_id = e.entity_id)
+        join covid19_muckrock.pages p 
+            on (ep.page_id = p.page_id)
+    where p.dc_id = :doc_id and
+          p.pg = :pg and
+          ep.etype = 'PERSON' and
+          e.wiki_id is NULL;
 
 -- name: delete-pii!
 -- Delete pii element from database

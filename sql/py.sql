@@ -23,9 +23,10 @@ select row_number() over (order by d.doc_id),
 select row_number() over (order by dp.doc_id), 
        dp.pg, dp.page_id, dp.exception_type, dp.body
     from covid19_muckrock.docpages dp
-    where dp.doc_id = :doc_id and dp.exception = 'Y'
-    order by dp.pg
-    limit 3;;
+    where dp.doc_id = :doc_id and 
+          dp.exception = 'Y' and 
+          dp.reprocessed is null
+    order by dp.pg;
 
 -- name: get-doc-pdf-filename$
 select pdf_filename
@@ -66,6 +67,15 @@ update covid19_muckrock.pages
        max_line_length = :max_line_length,
        reprocessed = now()
    where page_id = :page_id;
+
+-- name: add-page-exception!
+-- Add page exception to database   
+insert into covid19_muckrock.page_exceptions(page_id exception_type, comments)
+values (:page_id, 'langdetect', :comments);
+
+-- name:delete-page-exception!
+-- Delete page exception from database
+delete from covid19_muckrock.page_exceptions where page_id = :page_id;
 
 -- name: add-pii!
 -- Add pii element to database
@@ -130,4 +140,10 @@ delete from covid19_muckrock.entity_pages where page_id = :page_id;
 -- name: get-entity-id-by-name^
 select entity_id
    from covid19_muckrock.entities
-   where entity = :name; 
+   where entity = :name;
+
+-- name: add-page-tsvector!
+insert into covid19_muckrock.page_tsvectors(page_id, full_text)
+select page_id, to_tsvector('english'::regconfig, body::text)
+   from covid19_muckrock.docpages
+   where page_id = :page_id and exception = 'N';  

@@ -8,6 +8,7 @@ from   page_ner import page_ner
 from   pii_detect import detect_store_pii
 from   lang_detect import lang_eval
 import pdftotext
+import datetime
 
 
 def store_reprocessed_page(conn, stmts, page_id, text):
@@ -44,6 +45,7 @@ def reprocess_page_exception(conn, stmts, page_id, text):
 
 
 def main():
+    start_time=datetime.datetime.now()
     PDF_DOWNLOAD_DIR="tmp/"
     # db-related configuration
     conn = psycopg2.connect("")
@@ -51,8 +53,8 @@ def main():
     stmts = aiosql.from_path("sql/py.sql", "psycopg2")
 
     for cnt, doc_id, title, url in stmts.get_doc_exception_list(conn):
-        print(f'** DOCUMENT: {cnt}. {title} ({doc_id}): {url}')
         pdf_filename = get_pdf(doc_id)
+        print(f'** DOCUMENT: {cnt}. {title} ({doc_id}): {url}')
         for cnt, pg, page_id, exception, body in \
             stmts.get_docpage_exception_list(conn, doc_id=doc_id):
             print(f'**** {title} ({doc_id}) PAGE: {cnt}. pg:{pg}, \
@@ -69,6 +71,9 @@ exception: {exception}')
             reprocess_ner(conn, stmts, page_id)
             reprocess_pii_detect(conn, stmts, doc_id, pg, pdf[pg-1])
             reprocess_page_exception(conn, stmts, page_id, pdf[pg-1])
+    end_time=datetime.datetime.now()
+    print(f'start: {start_time}')
+    print(f'  end: {end_time}')
 
 if __name__ == "__main__":
     main()   

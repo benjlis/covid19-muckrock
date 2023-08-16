@@ -16,7 +16,7 @@ select row_number() over (order by d.doc_id),
                         from covid19_muckrock.docpages dp
                         where d.doc_id = dp.doc_id and 
                               exception = 'Y') and 
-          d.title = 'Sitka';
+          d.title = 'USAID-batch-4';
 
 -- name: get-docpage-exception-list
 -- Get all docs with at least one page exception
@@ -70,7 +70,7 @@ update covid19_muckrock.pages
 
 -- name: add-page-exception!
 -- Add page exception to database   
-insert into covid19_muckrock.page_exceptions(page_id exception_type, comments)
+insert into covid19_muckrock.page_exceptions(page_id, exception_type, comments)
 values (:page_id, 'langdetect', :comments);
 
 -- name:delete-page-exception!

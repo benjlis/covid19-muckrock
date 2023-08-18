@@ -25,7 +25,7 @@ select row_number() over (order by dp.doc_id),
     from covid19_muckrock.docpages dp
     where dp.doc_id = :doc_id and 
           dp.exception = 'Y' and
-          dp.exception_type != 'compressed_margins'
+          dp.exception_type != 'compressed_margins' and
           dp.reprocessed is null
     order by dp.pg;
 

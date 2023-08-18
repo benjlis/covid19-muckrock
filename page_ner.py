@@ -46,7 +46,7 @@ def page_ner(conn, stmts, page_id):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python script_name.py <entity_id>")
+        print("Usage: python page_ner.py <page_id>")
         sys.exit(1)
     # db-related configuration
     conn = psycopg2.connect("")

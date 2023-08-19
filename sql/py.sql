@@ -15,8 +15,11 @@ select row_number() over (order by d.doc_id),
     where exists (select 1
                         from covid19_muckrock.docpages dp
                         where d.doc_id = dp.doc_id and 
-                              exception = 'Y') and 
-          d.title = 'Encl_9_2020_07_30_Suryanarayanan_Response_11_12_2020_part03';
+                              dp.exception = 'Y' and
+                              dp.reprocessed is null and
+                              dp.exception_type != 
+                                       'compressed_margins')
+    limit 10;
 
 -- name: get-docpage-exception-list
 -- Get all docs with at least one page exception

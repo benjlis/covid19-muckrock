@@ -5,9 +5,11 @@ from   ocrmypdf import ocr
 from   page_ner import page_ner
 from   pii_detect import detect_store_pii
 from   lang_detect import lang_eval
+from   pdf2s3 import upload_s3
 import pdftotext
 import datetime
-
+import os
+from pathlib import Path
 
 def store_reprocessed_page(conn, stmts, page_id, text):
     text = text.replace('\x00', '') 
@@ -45,6 +47,8 @@ def reprocess_page_exception(conn, stmts, page_id, text):
 def main():
     start_time=datetime.datetime.now()
     PDF_DOWNLOAD_DIR="tmp/"
+    S3_BUCKET='foiarchive-db-backups'
+    S3_FOLDER='covid19-muckrock-pdfs-enhanced/'
     # db-related configuration
     conn = psycopg2.connect("")
     conn.set_session(autocommit=True)
@@ -68,12 +72,15 @@ def main():
         for cnt, pg, page_id, exception, body in reprocess_list:
             print(f'**** {title} ({doc_id}) PAGE: {cnt}. pg:{pg}, \
 exception: {exception}')
-            # print(f'Text Before Reprocessing: \n{body}\n')
-            # print(f'Text After Reprocessing: \n{pdf[pg-1]}\n')
+            print(f'Text Before Reprocessing: \n{body}\n')
+            print(f'Text After Reprocessing: \n{pdf[pg-1]}\n')
             store_reprocessed_page(conn, stmts, page_id, pdf[pg-1])
             reprocess_ner(conn, stmts, page_id)
             reprocess_pii_detect(conn, stmts, doc_id, pg, pdf[pg-1])
             reprocess_page_exception(conn, stmts, page_id, pdf[pg-1])
+        s3_filename = Path(pdf_filename).name
+        upload_s3(pdf_filename, S3_BUCKET, S3_FOLDER + s3_filename)
+        os.remove(pdf_filename)
     end_time=datetime.datetime.now()
     print(f'start: {start_time}')
     print(f'  end: {end_time}')

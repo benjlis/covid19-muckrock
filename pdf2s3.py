@@ -6,13 +6,6 @@ import boto3
 import fitz
 
 
-S3_BUCKET="foiarchive-db-backups"
-S3_OBJECT_PREFIX="covid19-muckrock-pdfs/"
-# db-related configuration
-conn = psycopg2.connect("")
-stmts = aiosql.from_path("sql/py.sql", "psycopg2")
-
-
 def convert_none(value):
     """Converts '' to None"""
     return value if value != '' else None 
@@ -39,38 +32,55 @@ def upload_s3(file_name, bucket, object_name=None):
     return True
 
 
-pgs = stmts.get_doc_pdf_list(conn)
-for p in pgs:    
-    cnt, doc_id, pdf_url = p
-    pdf_file = pdf_url.rsplit('/')[-1]
-    dcapi.download_pdf(pdf_url, pdf_file)
-    pdf_size = os.stat(pdf_file).st_size
-    print(f'{cnt}. {doc_id}: {pdf_file}, {pdf_size}')
-    with fitz.open(pdf_file) as d:
-        metadata = d.metadata
-        xml_metadata  = d.get_xml_metadata()
-        pg_cnt = d.page_count
-    print(metadata)
-    s3_uploaded = upload_s3(pdf_file, S3_BUCKET, S3_OBJECT_PREFIX + pdf_file)
-    if s3_uploaded:
-        stmts.add_pdf(conn, id=doc_id, size=pdf_size, 
-                      filename=pdf_file, pg_cnt=pg_cnt, 
-                      version=metadata['format'],
-                      title=convert_none(metadata['title']), 
-                      author=convert_none(metadata['author']),
-                      subject=convert_none(metadata['subject']),
-                      keywords=convert_none(metadata['keywords']),
-                      creator=convert_none(metadata['creator']), 
-                      producer=convert_none(metadata['producer']),
-                      created=convert_none(metadata['creationDate'][2:19]\
-                                           .replace('Z','-00')),
-                      modified=convert_none(metadata['modDate'][2:19]\
-                                            .replace('Z','-00')),
-                      trapped=convert_none(metadata['trapped']),
-                      encryption=convert_none(metadata['encryption']),
-                      xml_metadata=convert_none(xml_metadata),
-                      s3_uploaded=s3_uploaded)
-        conn.commit()        
+def upload_pdf_list(conn, stmts):
+    S3_BUCKET="foiarchive-db-backups"
+    S3_OBJECT_PREFIX="covid19-muckrock-pdfs/"
+    #
+    pgs = stmts.get_doc_pdf_list(conn)
+    for p in pgs:    
+        cnt, doc_id, pdf_url = p
+        pdf_file = pdf_url.rsplit('/')[-1]
+        dcapi.download_pdf(pdf_url, pdf_file)
+        pdf_size = os.stat(pdf_file).st_size
+        print(f'{cnt}. {doc_id}: {pdf_file}, {pdf_size}')
+        with fitz.open(pdf_file) as d:
+            metadata = d.metadata
+            xml_metadata  = d.get_xml_metadata()
+            pg_cnt = d.page_count
+        print(metadata)
+        s3_uploaded = upload_s3(pdf_file, S3_BUCKET, S3_OBJECT_PREFIX + pdf_file)
+        if s3_uploaded:
+            stmts.add_pdf(conn, id=doc_id, size=pdf_size, 
+                          filename=pdf_file, pg_cnt=pg_cnt, 
+                          version=metadata['format'],
+                          title=convert_none(metadata['title']), 
+                          author=convert_none(metadata['author']),
+                          subject=convert_none(metadata['subject']),
+                          keywords=convert_none(metadata['keywords']),
+                          creator=convert_none(metadata['creator']), 
+                          producer=convert_none(metadata['producer']),
+                          created=convert_none(metadata['creationDate']\
+                                               [2:19].replace('Z','-00')),
+                          modified=convert_none(metadata['modDate']\
+                                                [2:19].replace('Z','-00')),
+                          trapped=convert_none(metadata['trapped']),
+                          encryption=convert_none(metadata['encryption']),
+                          xml_metadata=convert_none(xml_metadata),
+                          s3_uploaded=s3_uploaded)
+            conn.commit()        
+        else:
+            print ('error uploading to s3')
+        os.remove(pdf_file)
+
+
+if __name__ == "__main__":
+    # conn = psycopg2.connect("")
+    # stmts = aiosql.from_path("sql/py.sql", "psycopg2")
+    # upload_pdf_list(conn, stmts)
+    status=upload_s3('tmp/test.pdf', 
+                     'foiarchive-db-backups', 
+                      'covid19-muckrock-pdfs-enhanced/test.pdf')
+    if status:
+        print('success')
     else:
-        print ('error uploading to s3')
-    os.remove(pdf_file) 
+        print('failure')

@@ -12,14 +12,17 @@ select row_number() over (order by d.doc_id),
 select row_number() over (order by d.doc_id), 
        d.doc_id, d.title, d.s3_pdf_url
     from covid19_muckrock.docs d
-    where exists (select 1
+    where doc_id not in (6840728,  -- DecompressionBombError
+                         20105625) -- Page size must be between 3 and 14400 PDF units
+          and
+          exists (select 1
                         from covid19_muckrock.docpages dp
                         where d.doc_id = dp.doc_id and 
                               dp.exception = 'Y' and
                               dp.reprocessed is null and
                               dp.exception_type != 
                                        'compressed_margins')
-    limit 10;
+    limit 5;
 
 -- name: get-docpage-exception-list
 -- Get all docs with at least one page exception
@@ -56,6 +59,12 @@ select row_number() over (order by p.dc_id),
 select body
     from covid19_muckrock.pages
     where page_id = :page_id;
+
+-- name: get-doc-pg-body$
+select body
+    from covid19_muckrock.docpages
+    where doc_id = :doc_id and
+          pg = :pg;
 
 -- name: add-page!
 -- Add page of text to database

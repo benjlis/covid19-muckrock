@@ -19,14 +19,13 @@ select row_number() over (order by d.doc_id),
                          20489813, -- Ghostscript rasterizing failed
                          20492530) -- PDF is encrypted
           and
-          exists (select 1
-                        from covid19_muckrock.docpages dp
-                        where d.doc_id = dp.doc_id and 
-                              dp.exception = 'Y' and
-                              dp.reprocessed is null and
-                              dp.exception_type != 
-                                       'compressed_margins')
-    limit 10;
+          exists (select doc_id 
+                    from covid19_muckrock.docpages
+                    where doc_id = d.doc_id and
+                          exception_type != 'compressed_margins' and
+                          reprocessed is null
+                    group by doc_id
+                    having count(*) <= 50);
 
 -- name: get-docpage-exception-list
 -- Get all docs with at least one page exception

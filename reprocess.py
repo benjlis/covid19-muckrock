@@ -55,7 +55,6 @@ def main():
 
     for cnt, doc_id, title, url in stmts.get_doc_exception_list(conn):
         pdf_filename = get_pdf(doc_id)
-        # pdf_filename = '' # if failure in flight
         print(f'** DOCUMENT: {cnt}. {title} ({doc_id}): {url}')
         print(f'{datetime.datetime.now()}')
         reprocess =  stmts.get_docpage_exception_list(conn, doc_id=doc_id)

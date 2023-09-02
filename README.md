@@ -6,6 +6,8 @@ Scripts for preprocessing and downloading of metadata and text for the History L
 2. install requirements:
 ```
 pip install -r requirements.txt
+
+python -m spacy download en_core_web_lg
 ```
 3. Set environmental variables `MR_USER` and `MR_PSWD` to a DocumentCloud account with access to the _History Lab COVID-19 Archive_ project. Set `PG*` enviornmental variables to the PostgreSQL FOIArchive database.
 ```

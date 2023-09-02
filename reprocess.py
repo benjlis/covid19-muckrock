@@ -46,7 +46,6 @@ def reprocess_page_exception(conn, stmts, page_id, text):
 
 def main():
     start_time=datetime.datetime.now()
-    PDF_DOWNLOAD_DIR="tmp/"
     S3_BUCKET='foiarchive-db-backups'
     S3_FOLDER='covid19-muckrock-pdfs-enhanced/'
     # db-related configuration

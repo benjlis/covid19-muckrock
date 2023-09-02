@@ -17,7 +17,12 @@ select row_number() over (order by d.doc_id),
                          20462390, -- Ran out of disk space
                          20485951, -- Exceeds pixel limit
                          20489813, -- Ghostscript rasterizing failed
-                         20492530) -- PDF is encrypted
+                         20492530, -- PDF is encrypted
+                         20974843, -- ValueError: integer out of range
+                         23824278, -- ValueError: Page size must be between 3 and 14400 PDF units
+                         23824037, -- ValueError: Page size must be between 3 and 14400 PDF units
+                         23824367, -- ValueError: Page size must be between 3 and 14400 PDF units
+                         23824371) -- ValueError: Page size must be between 3 and 14400 PDF units
           and
           exists (select doc_id 
                     from covid19_muckrock.docpages
@@ -25,7 +30,7 @@ select row_number() over (order by d.doc_id),
                           exception_type != 'compressed_margins' and
                           reprocessed is null
                     group by doc_id
-                    having count(*) <= 50);
+                    having count(*) <= 125);
 
 -- name: get-docpage-exception-list
 -- Get all docs with at least one page exception

@@ -64,19 +64,23 @@ def main():
         print(f'reprocessing {len(pages)} pages')
         print(f'pages: {pages_str}')
         print(f'OCRing pages:')
-        ocr(input_file=pdf_filename, output_file=pdf_filename,
-            pages=pages_str, force_ocr=True, clean=True, output_type='pdf')
-        with open(pdf_filename, "rb") as f:
-            pdf = pdftotext.PDF(f, physical=True)  
-        for cnt, pg, page_id, exception, body in reprocess_list:
-            print(f'**** {title} ({doc_id}) PAGE: {cnt}. pg:{pg}, \
+        try:
+            ocr(input_file=pdf_filename, output_file=pdf_filename,
+                pages=pages_str, force_ocr=True, clean=True, 
+                output_type='pdf')
+            with open(pdf_filename, "rb") as f:
+                pdf = pdftotext.PDF(f, physical=True)  
+            for cnt, pg, page_id, exception, body in reprocess_list:
+                print(f'**** {title} ({doc_id}) PAGE: {cnt}. pg:{pg}, \
 exception: {exception}')
-            print(f'Text Before Reprocessing: \n{body}\n')
-            print(f'Text After Reprocessing: \n{pdf[pg-1]}\n')
-            store_reprocessed_page(conn, stmts, page_id, pdf[pg-1])
-            reprocess_ner(conn, stmts, page_id)
-            reprocess_pii_detect(conn, stmts, doc_id, pg, pdf[pg-1])
-            reprocess_page_exception(conn, stmts, page_id, pdf[pg-1])
+                print(f'Text Before Reprocessing: \n{body}\n')
+                print(f'Text After Reprocessing: \n{pdf[pg-1]}\n')
+                store_reprocessed_page(conn, stmts, page_id, pdf[pg-1])
+                reprocess_ner(conn, stmts, page_id)
+                reprocess_pii_detect(conn, stmts, doc_id, pg, pdf[pg-1])
+                reprocess_page_exception(conn, stmts, page_id, pdf[pg-1])
+        except Exception as e:
+            print(f'OCR_FAILURE:{doc_id}:{e}')
         s3_filename = Path(pdf_filename).name
         upload_s3(pdf_filename, S3_BUCKET, S3_FOLDER + s3_filename)
         os.remove(pdf_filename)

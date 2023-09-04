@@ -30,7 +30,19 @@ select row_number() over (order by d.doc_id),
                           exception_type != 'compressed_margins' and
                           reprocessed is null
                     group by doc_id
-                    having count(*) <= 125);
+                    having count(*) > 125 and count(*) <= 200);
+
+-- name: get-doc-noexception-list
+-- Get all docs without a single page exception
+select row_number() over (order by d.doc_id), 
+       d.doc_id, d.title, d.s3_pdf_url
+    from covid19_muckrock.docs d
+    where not exists (select 1 
+                         from covid19_muckrock.docpages
+                         where doc_id = d.doc_id and 
+                               (reprocessed is not null or 
+                                exception = 'Y'));
+
 
 -- name: get-docpage-exception-list
 -- Get all docs with at least one page exception

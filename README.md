@@ -2,6 +2,8 @@
 Scripts and programs for downloadinging the metadata and text for the History Lab-Muckrock COVID-19 Collection.
 
 # install instructions
+Requires Python version 3.9 or higher.
+
 1. Ensure underlying C-libraries are installed for OCRmyPDF and pdftotext. See these pages for OS-specific guidance:
     * https://pypi.org/project/ocrmypdf/ 
     * https://pypi.org/project/pdftotext/

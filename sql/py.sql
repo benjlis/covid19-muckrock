@@ -8,29 +8,16 @@ select row_number() over (order by d.doc_id),
                         where p.dc_id = d.dc_id);
 
 -- name: get-doc-exception-list
--- Get all docs with at least one page exception
+-- Get all docs with at least one page exception that hasn't been reprocessed
 select row_number() over (order by d.doc_id), 
        d.doc_id, d.title, d.s3_pdf_url
     from covid19_muckrock.docs d
-    where doc_id not in (6840728,  -- DecompressionBombError
-                         20105625, -- Page size must be between 3 and 14400 PDF units
-                         20462390, -- Ran out of disk space
-                         20485951, -- Exceeds pixel limit
-                         20489813, -- Ghostscript rasterizing failed
-                         20492530, -- PDF is encrypted
-                         20974843, -- ValueError: integer out of range
-                         23824278, -- ValueError: Page size must be between 3 and 14400 PDF units
-                         23824037, -- ValueError: Page size must be between 3 and 14400 PDF units
-                         23824367, -- ValueError: Page size must be between 3 and 14400 PDF units
-                         23824371) -- ValueError: Page size must be between 3 and 14400 PDF units
-          and
-          exists (select doc_id 
+    where exists (select doc_id 
                     from covid19_muckrock.docpages
                     where doc_id = d.doc_id and
                           exception_type != 'compressed_margins' and
                           reprocessed is null
-                    group by doc_id
-                    having count(*) > 125 and count(*) <= 200);
+                    group by doc_id);
 
 -- name: get-doc-noexception-list
 -- Get all docs without a single page exception

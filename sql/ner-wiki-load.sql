@@ -14,15 +14,11 @@ create table covid19_muckrock.ner_load (
 update covid19_muckrock.ner_load 
    set wiki_id = NULL 
    where wiki_id in ('NIL', 'No Wiki', 'HL100001');
-update covid19_muckrock.ner_load 
-   set wiki_id2 = NULL 
-   where wiki_id2 in ('No Wiki', 'HL100001');
 
--- moved to single insert
---insert into covid19_muckrock.entities(wikidata_id, entity)
---select distinct wiki_id2, item_label
---   from covid19_muckrock.ner_load
---   where wiki_id2 is not null;
+-- Create index on wiki_id
+create index on covid19_muckrock.ner_load(wiki_id);
+
+-- Populate entities based on wiki_id in ner_load
 insert into covid19_muckrock.entities(wikidata_id, entity, enttype)
 select distinct wiki_id, w.item_label,
        case when w.instance_of = 'human'        then 'PERSON'
@@ -72,23 +68,22 @@ select distinct wiki_id, w.item_label,
       on n.wiki_id = w.wikidata_id
    where wiki_id is not null;
 
+-- where we don't have a mapping take the most freq occuring enttype
+-- in ner_load
+update covid19_muckrock.entities e
+   set updated = now(),
+       enttype = (select n.enttype 
+                     from (select enttype, count(*) 
+                               from covid19_muckrock.ner_load n
+                               where n.wiki_id = e.wikidata_id
+                               group by enttype
+                               order by count(*) desc 
+                               limit 1) n)
+   where enttype = '**TBD**';
+-- Some of these are good some are not! discuss how to fix
 
 
--- Create index on wiki_id
-create index on covid19_muckrock.ner_load(wiki_id);
--- Update item_label in cases where we know it but it is missing
-update covid19_muckrock.ner_load n 
-   set item_label = (select distinct item_label 
-                        from covid19_muckrock.ner_load i
-                        where i.wiki_id = n.wiki_id and 
-                              i.item_label is not null) 
-   where wiki_id is NOT NULL and item_label is NULL;
-
--- 24442 rows
-select count(*) from ner_load where wiki_id is NOT NULL and item_label is NULL;
-
-
--- Assumes previous content of entities and entity_pages has been deleted
+-- Load additional data from Ray
 create table covid19_muckrock.wikidata_updates_temp (
     id          int generated always as identity primary key,
     entity      text,
@@ -99,136 +94,12 @@ create table covid19_muckrock.wikidata_updates_temp (
 delete from covid19_muckrock.wikidata_updates_temp 
    where wikidata_id = 'NIL'; 
 
-
-create or replace view covid19_muckrock.ner_load_enttype_select as
-select item_label, wiki_id, enttype, count(*) cnts,
-       rank() over (partition by item_label, wiki_id 
-                    order by count(*) desc) ranking,
-       row_number() over (partition by item_label, wiki_id 
-                          order by count(*) desc) row_ranking              
-    from ner_load 
-    where wiki_id is not null
-    group by item_label, wiki_id, enttype
-    order by item_label, wiki_id, cnts desc;
-
-insert into covid19_muckrock.entities(entity, enttype, wikidata_id)
-select distinct coalesce(item_label, entity), enttype, wiki_id
-   from covid19_muckrock.ner_load_enttype_select
-   where row_ranking = 1;
-
-
-select count(*) 
-   from (select wiki_id
-            from ner_load
-            where wiki_id is not null
-            group by wiki_id
-            having count(distinct coalesce(item_label, entity)) >1) n 
-
-with eb (select item_label, enttype, wiki_id 
-            from ner_load 
-            where wiki_id is not null and
-                  item_label = 'Maryland Aviation Administration'
-            group by item_label, enttype, wiki_id
-            order by cnts desc
-
-            
-where item_label = 'Maryland Aviation Administration' group by item_label, enttype, wiki_id;
-
-
-
-
-select count(*), count(distinct n.id), count(distinct w.wikidata_id) 
-   from ner_load n join wikidata_updates_temp w on (n.entity = w.entity)
-   where n.wiki_id is null;
-
-select * from entities where entity in (select entity from wikidata_updates_temp
-   group by entities
-   having count(entity) > 1);
-
--- small number missing
-select wikidata_id from wikidata_updates_temp except select wikidata_id from wikidata_items;
-
--- Fill in the blank cases
--- select /* n.id, n.entity, i.item_label, i.wikidata_id, i.instance_of */ count(*)
---   from covid19_muckrock.ner_load n join 
---        covid19_muckrock.wikidata_items i on (i.item_label = n.entity)
---   where  n.wiki_id is null
---   order by n.id, i.wikidata_id;
-update covid19_muckrock.ner_load n
-   set wiki_id = (select w.wikidata_id 
-                     from covid19_muckrock.wikidata_items w
-                     where w.item_label = n.entity)
-   where wiki_id is null and
-         exists (select 1
-                    from covid19_muckrock.wikidata_items w2
-                     where w2.item_label = n.entity);
-
-
-
-create index on ner_load(wiki_id);
-
-select count(*) from 
-    (select count(n.id)
-       from covid19_muckrock.ner_load n join 
-        covid19_muckrock.wikidata_aliases a on (n.entity = a.item_label)
-                                    join
-        covid19_muckrock.wikidata_items i on (i.wikidata_id = a.wikidata_id)
-       where  n.wiki_id is null
-       group by n.id
-       having count(*) > 1) n;
-
-
-
-
-
-select count(*) total_alias_matches, count(*) filter(where n.entity = i.item_label) fill_in_the_blank_matches
-   from covid19_muckrock.ner_load n join 
-        covid19_muckrock.wikidata_aliases a on (n.entity = a.item_label)
-                                    join
-        covid19_muckrock.wikidata_items i on (i.wikidata_id = a.wikidata_id)
-   where  n.wiki_id is null;
-
-
-select n.id, n.entity, i.item_label, i.wikidata_id, i.instance_of       -- count(*)
-   from covid19_muckrock.ner_load n join 
-        covid19_muckrock.wikidata_aliases a on (n.entity = a.item_label)
-                                    join
-        covid19_muckrock.wikidata_items i on (i.wikidata_id = a.wikidata_id)
-   where  n.wiki_id is null
-   order by n.id, i.wikidata_id;
-
--- update ner_load set wiki_id =  regexp_replace(wiki_id, '\s+$', '');
---
--- No Wiki: we've checked and there's not currently a wikid data id, but we think this string represents an entity
--- NIL: we've not yet checked this entity. It might not even be an entity.
-
--- entites
---
-insert into entities(entity)
-    select distinct entity from ner_load;
-update entities e 
-    set wiki_id = (select min(wiki_id)
-                    from ner_load
-                    where wiki_id != 'NIL' and
-                          entity = e.entity),
-        enttype = (select enttype 
-                    from ner_load
-                    where entity = e.entity
-                    group by enttype
-                    order by count(enttype) desc
-                    limit 1);                          
-alter table entities alter column enttype set not null;
-
-with l (file, uc, pc, entity, enttype, estart, eend) as
-       (select file, position('_' in file),  position('.' in file),
-               entity, enttype, estart, eend
-            from ner_load)
-insert into entity_pages(entity_id, page_id, etext, etype, estart, eend)
-select e.entity_id, p.page_id, l.entity, l.enttype, l.estart, l.eend   
-    from l join pages p on (p.dc_id = substr(file, 1, uc-1)::int and
-                            p.pg = substr(file, uc+1, pc-uc-1)::int)
-           join entities e on (e.entity = l.entity);
-
-
--- collapse on wiki ID
---
+-- further updates
+select count(*) updates,
+       count(i.wikidata_id)             item_in_db,
+       count(*) - count(i.wikidata_id)  item_not_in_db 
+   from covid19_muckrock.wikidata_updates_temp u left join
+        covid19_muckrock.wikidata_items i 
+         on (u.wikidata_id = i.wikidata_id);
+-- must load wikidata items first
+-- also consider restricting certain instance_of, e.g., Andrew - Q18042461

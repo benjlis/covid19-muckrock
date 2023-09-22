@@ -22,7 +22,7 @@ create index on covid19_muckrock.ner_load(wiki_id);
 insert into covid19_muckrock.entities(wikidata_id, entity, enttype)
 select distinct wiki_id, w.item_label,
        case when w.instance_of = 'human'        then 'PERSON'
-            when w.instance_of = 'human population'  then 'PERSON'
+            when w.instance_of = 'human population'  then 'NORP'
             when w.instance_of like '%agency%'  then 'ORG'
             when w.instance_of like '%city%'    then 'GPE'
             when w.instance_of like 'county%'   then 'GPE'
@@ -103,3 +103,12 @@ select count(*) updates,
          on (u.wikidata_id = i.wikidata_id);
 -- must load wikidata items first
 -- also consider restricting certain instance_of, e.g., Andrew - Q18042461
+
+-- aliases
+select n.entity, i.item_label, i.wikidata_id, count(*) 
+   from covid19_muckrock.ner_load n join
+        covid19_muckrock.wikidata_aliases a on (n.entity = a.item_label) join
+        covid19_muckrock.wikidata_items i on (a.wikidata_id = i.wikidata_id)
+   where n.wiki_id is null
+   group by n.entity, i.item_label, i.wikidata_id;
+-- how to minimize false positives? handle duplicates.

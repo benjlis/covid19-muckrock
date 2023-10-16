@@ -1,3 +1,12 @@
+-- name: get-all-docs
+-- Get all docs in collection
+select row_number() over (order by d.doc_id), 
+       d.doc_id, d.title, d.pdf_filename, d.pg_cnt
+   from covid19_muckrock.docs d
+   -- where title = 'Sitka'
+   where doc_id = 20615282
+   order by d.doc_id;
+
 -- name: get-doc-download-list
 -- Get all docs whose text needs downloading
 select row_number() over (order by d.doc_id), 
@@ -166,4 +175,11 @@ select entity_id
 insert into covid19_muckrock.page_tsvectors(page_id, full_text)
 select page_id, to_tsvector('english'::regconfig, body::text)
    from covid19_muckrock.docpages
-   where page_id = :page_id and exception = 'N';  
+   where page_id = :page_id and exception = 'N';
+
+-- name: get-pii-doc
+select p.page_id, p.pg, pii_type, pii_text, start_idx, end_idx
+    from covid19_muckrock.pii pii join covid19_muckrock.pages p
+        on (pii.dc_id = p.dc_id and pii.pg = p.pg)
+    where pii.dc_id = :doc_id
+    order by p.pg; 
